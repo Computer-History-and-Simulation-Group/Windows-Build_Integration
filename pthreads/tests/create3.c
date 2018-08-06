@@ -1,14 +1,16 @@
 /*
+ * File: create3.c
  *
  *
  * --------------------------------------------------------------------------
  *
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
- *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *      Copyright(C) 1999,2012 Pthreads-win32 contributors
+ *
+ *      Homepage1: http://sourceware.org/pthreads-win32/
+ *      Homepage2: http://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
@@ -31,40 +33,78 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  *
  * --------------------------------------------------------------------------
- * From: Todd Owen <towen@lucidcalm.dropbear.id.au>
- * To: pthreads-win32@sourceware.cygnus.com
- * Subject: invalid page fault when using LoadLibrary/FreeLibrary
- * 
- * hi,
- * for me, pthread.dll consistently causes an "invalid page fault in
- * kernel32.dll" when I load it "explicitly"...to be precise, loading (with
- * LoadLibrary) isn't a problem, it gives the error when I call FreeLibrary.
- * I guess that the dll's cleanup must be causing the error.
- * 
- * Implicit linkage of the dll has never given me this problem.  Here's a
- * program (console application) that gives me the error.
- * 
- * I compile with: mingw32 (gcc-2.95 release), with the MSVCRT add-on (not
- * that the compiler should make much difference in this case).
- * PTHREAD.DLL: is the precompiled 1999-11-02 one (I tried an older one as
- * well, with the same result).
- * 
- * Fascinatingly, if you have your own dll (mycode.dll) which implicitly
- * loads pthread.dll, and then do LoadLibrary/FreeLibrary on _this_ dll, the
- * same thing happens.
- * 
+ *
+ * Test Synopsis:
+ * - Test passing arg to thread function.
+ *
+ * Test Method (Validation or Falsification):
+ * - Statistical, not absolute (depends on sample size).
+ *
+ * Requirements Tested:
+ * -
+ *
+ * Features Tested:
+ * -
+ *
+ * Cases Tested:
+ * -
+ *
+ * Description:
+ * -
+ *
+ * Environment:
+ * -
+ *
+ * Input:
+ * - None.
+ *
+ * Output:
+ * - File name, Line number, and failed expression on failure.
+ * - No output on success.
+ *
+ * Assumptions:
+ * -
+ *
+ * Pass Criteria:
+ * - Process returns zero exit status.
+ *
+ * Fail Criteria:
+ * - Process returns non-zero exit status.
  */
 
 #include "test.h"
 
-int main() {
-  HINSTANCE hinst;
+enum {
+  NUMTHREADS = 10000
+};
 
-  assert((hinst = LoadLibrary("pthread")) != (HINSTANCE) 0);
+static int washere = 0;
 
-  Sleep(100);
+void * func(void * arg)
+{
+  washere = (int)(size_t)arg;
+  return (void *) 0; 
+}
+ 
+int
+main()
+{
+  pthread_t t;
+  pthread_attr_t attr;
+  void * result = NULL;
+  int i;
 
-  FreeLibrary(hinst);
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+  for (i = 0; i < NUMTHREADS; i++)
+    {
+      washere = 0;
+      assert(pthread_create(&t, &attr, func, (void *)(size_t)1) == 0);
+      assert(pthread_join(t, &result) == 0);
+      assert((int)(size_t)result == 0);
+      assert(washere == 1);
+    }
+
   return 0;
 }
-
