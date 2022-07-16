@@ -1,4 +1,6 @@
+#
 #	Ignore these files due to size or version
+#
 SDL*.zip
 *pcap*.exe
 WpcapSrc*.zip
