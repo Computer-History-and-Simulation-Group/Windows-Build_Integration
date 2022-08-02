@@ -65,10 +65,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <zlib.h>
 #endif
 
-#ifdef _WIN32
-#define snprintf _snprintf
-#endif
-
 #ifdef SUPPORT_LIBBZ2
 #include <bzlib.h>
 #endif
