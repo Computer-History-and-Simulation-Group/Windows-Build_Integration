@@ -95,4 +95,5 @@ Visual Studio Projects/*
 !Windows-Build/lib/lib-VC2019/Release/*
 !Windows-Build/lib/lib-VC2022/Debug/*
 !Windows-Build/lib/lib-VC2022/Release/*
+!Windows-Build/libSDL2/*
 #
