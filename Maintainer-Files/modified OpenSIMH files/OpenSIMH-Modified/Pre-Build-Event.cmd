@@ -105,7 +105,7 @@ rem any meaning, it always gets set.
   call :FindVCVersion _VC_VER
   
   set _X_WINDOWS_BUILD=
-  for /F "usebackq tokens=2" %%i in (`findstr /C:"WINDOWS-BUILD" \..\Windows-Build\Windows-Build_Versions.txt`) do SET _X_WINDOWS_BUILD=%%i
+  for /F "usebackq tokens=2" %%i in (`findstr /C:"WINDOWS-BUILD" ..\Windows-Build\Windows-Build_Versions.txt`) do SET _X_WINDOWS_BUILD=%%i
   set _X_LAST_WINDOWS_BUILD=
   if exist Pre-Build-Event.last-windows-build-version.txt for /F "usebackq tokens=2" %%i in (`findstr /C:"WINDOWS-BUILD" Pre-Build-Event.last-windows-build-version.txt`) do SET _X_LAST_WINDOWS_BUILD=%%i
   if "%_X_WINDOWS_BUILD%" EQU "%_X_LAST_WINDOWS_BUILD%" goto _new_or_same_windows_build
@@ -114,7 +114,7 @@ rem any meaning, it always gets set.
   if exist ..\Windows-Build\lib\Debug   rmdir/s/q ..\Windows-Build\lib\Debug
   if exist ..\Windows-Build\lib\Release rmdir/s/q ..\Windows-Build\lib\Release
   if exist ..\Windows-Build\lib\VisualCVersionSupport.txt del ..\Windows-Build\lib\VisualCVersionSupport.txt
-  echo "Windows-Build           %_X_WINDOWS_BUILD%" > Pre-Build-Event.last-Windows-Build-version.txt
+  echo WINDOWS-BUILD           %_X_WINDOWS_BUILD% > Pre-Build-Event.last-Windows-Build-version.txt
 
 :_new_or_same_windows_build
 
@@ -132,26 +132,15 @@ rem any meaning, it always gets set.
   set _X_VC_VER_DIR=
   for /d %%i in ("..\Windows-Build\lib\*") do call :CheckDirectoryVCSupport _X_VC_VER_DIR %%i "..\Windows-Build\lib\"
   if "%_X_VC_VER_DIR%" equ "" goto _VC_VER_notice
-  rem  echo "[_find_vc_support] Done _find_vc_support"
-  rem  echo.
 
 :_make_vc_support_active
-
-  rem  echo "[_make_vc_support_active] _X_VC_VER_DIR       = %_X_VC_VER_DIR%"
-  rem  echo "[_make_vc_support_active] _VC_VER             = %_VC_VER%"
   
   for /F "usebackq tokens=2*" %%i in (`findstr /C:"_VC_VER=%_VC_VER% " "%_X_VC_VER_DIR%\VisualCVersionSupport.txt"`) do set _X_VC_VER=%%i %%j
   echo Enabling Library support for %_X_VC_VER%
   
-  rem  echo "[_make_vc_support_active] Calling procedure:    %_X_VC_VER_DIR%\Install-Library-Support.cmd"
-  
   call "%_X_VC_VER_DIR%\Install-Library-Support.cmd"
 
-  rem  echo "[_make_vc_support_active] Done _make_vc_support_active"
-
 :_done_check_files
-  rem  echo "[done_check_files] Done done_check_files"
-
 
   if "%_X_FINDFONT%" == "" goto _done_findfont
   if "%_X_FontName%" == "" goto _done_findfont
@@ -368,24 +357,13 @@ goto End_Procedure
 
 :CheckDirectoryVCSupport
 
-  rem set _VC_Check_Path=%~3%~2/
-  rem echo "[CheckDirectoryVCSupport] original _VC_Check_Path = %_VC_Check_Path%"
-  rem set _VC_Check_Path=%_VC_Check_Path:/=\%
-  rem echo "[CheckDirectoryVCSupport] original _VC_Check_Path = %_VC_Check_Path%"
-  
   set _VC_Check_Path=%~2
   set _VC_Check_Filespec=%_VC_Check_Path%\VisualCVersionSupport.txt
-  rem echo "[CheckDirectoryVCSupport] _VC_Check_Path      = %_VC_Check_Path%"
-  rem echo "[CheckDirectoryVCSupport] _VC_Check_Filespec  = %_VC_Check_Filespec%"
-  rem echo "[CheckDirectoryVCSupport] Variable ~2 = %~2"
-  rem echo "[CheckDirectoryVCSupport] Variable ~3 = %~3"
   if not exist "%_VC_Check_Filespec%" (
 	echo "[CheckDirectoryVCSupport] VisualCVersionSupport.txt MISSING"
 	exit /B 1
   )
   for /F "usebackq tokens=2*" %%k in (`findstr /C:"_VC_VER=%_VC_VER% " "%_VC_Check_Filespec%"`) do set %1=%_VC_Check_Path%
-  rem echo "[CheckDirectoryVCSupport] _VC_Check_Path      = %_VC_Check_Path%"
-  rem echo.
   exit /B 0
 
 !	--------------------
